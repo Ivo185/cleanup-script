@@ -24,16 +24,13 @@ function Clean-Target {
     Write-Host $msg.OK -ForegroundColor Green
 }
 
-# ТОЧКА ЗА ВЪЗСТАНОВЯВАНЕ
 Write-Progress -Activity "System" -Status "Creating Restore Point" -PercentComplete 10
 Checkpoint-Computer -Description "PC_Optimizer_Point" -RestorePointType "MODIFY_SETTINGS" -ErrorAction SilentlyContinue
 
-# ИЗПЪЛНЕНИЕ
 Clean-Target -Path $env:TEMP -Name $msg.UserTemp
 Clean-Target -Path "C:\Windows\Temp" -Name $msg.WinTemp
 Clean-Target -Path "C:\Windows\Prefetch" -Name $msg.Prefetch
 
-# Кошче
 Write-Host ($msg.Checking -f $msg.Bin) -NoNewline
 $bBin = Get-FreeSpace
 Clear-RecycleBin -Force -ErrorAction SilentlyContinue
@@ -46,13 +43,11 @@ if ($global:doLog) {
     Add-Content $global:logPath -Value $logMsg
 }
 
-# WinSxS
 if ($global:doSxS) {
     Write-Progress -Activity "Cleanup" -Status "Optimizing WinSxS" -PercentComplete 80
     DISM.exe /online /Cleanup-Image /StartComponentCleanup /Quiet
 }
 
-# SMART SCANNER
 if ($global:doSmart) {
     $smartTotalFreed = 0.0 
     $whitelist = @("Microsoft","Windows","Common Files","NVIDIA","Intel","AMD","Google","Steam","Epic Games","Windows Defender","Windows Defender Advanced Threat Protection","Windows Mail","Windows Media Player","Windows NT","WindowsPowerShell","Windows Photo Viewer","WindowsApps","Internet Explorer","Microsoft.NET","Dolby","Package Cache","Microsoft DevDiv","K7F0O","ssh","USOPrivate","USOShared","Whesvc",".IdentityService","Backup","Packages","pip","Programs","speech","ConnectedDevicesPlatform","CEF","Microsoft_Corporation","Microsoft Office 15","ModifiableWindowsApps","Lenovo","D3DSCache","PackageManagement","Temp")
@@ -83,4 +78,5 @@ if ($global:doSmart) {
         $logMsg = $msg.LogSmartTotal -f $smartTotalFreed.ToString("N2")
         Add-Content $global:logPath -Value $logMsg
     }
+
 }
